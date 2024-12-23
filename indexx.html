@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Explore Restaurants</title>
+</head>
+
+<body class="bg-gray-100">
+    <h1 class="text-center text-3xl text-blue-500 font-semibold mt-6">Search Your Favorite Food Here</h1>
+
+    <div class="flex justify-center my-4">
+        <div class="flex items-center">
+            <input id="search-input" class="border-2 border-blue-600 rounded-l p-2" type="text"
+                placeholder="Search your food here">
+            <button id="search-button"
+                class="px-4 py-2 border-2 border-blue-600 rounded-r bg-blue-500 text-white">Search</button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-4 px-6" id="search-display"></div>
+
+    <script>
+        // Event listener for the search button
+        document.getElementById('search-button').addEventListener('click', function () {
+            const searchInput = document.getElementById('search-input');
+            const searchText = searchInput.value.trim();
+
+            if (searchText === '') {
+                alert("Please enter a food item to search.");
+                return;
+            }
+
+            const url = `https://www.themealdb.com/api/json/v1/1/search.php?s=${searchText}`;
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.meals) {
+                        displayFood(data.meals);
+                    } else {
+                        alert("No meals found.");
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("An error occurred while fetching the data.");
+                });
+        });
+
+        // Function to display food items
+        const displayFood = (foods) => {
+            const displayDiv = document.getElementById('search-display');
+            displayDiv.innerHTML = ''; // Clear previous results
+
+            foods.forEach(food => {
+                const div = document.createElement("div");
+                div.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg', 'text-center');
+                div.innerHTML = `
+                    <img src="${food.strMealThumb}" alt="${food.strMeal}" class="w-full h-48 object-cover rounded-t-lg">
+                    <div class="mt-2">
+                        <h3 class="text-xl font-semibold text-blue-600">${food.strMeal}</h3>
+                        <p class="text-gray-600 text-sm mt-1">${food.strInstructions.substring(0, 100)}...</p>
+                    </div>
+                `;
+                displayDiv.appendChild(div);
+            });
+        };
+    </script>
+</body>
+
+</html>
